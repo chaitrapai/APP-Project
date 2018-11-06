@@ -22,8 +22,11 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import javax.ws.rs.core.HttpHeaders;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Services run as singletons
@@ -49,6 +52,7 @@ public class UsersService {
     }
 
     public ArrayList<Users> getAll() {
+
         ArrayList<Users> userList = new ArrayList<Users>();
 
         FindIterable<Document> results = usersCollection.find();
@@ -62,7 +66,12 @@ public class UsersService {
         return userList;
     }
 
-    public Users getOne(String id) {
+    public Users getOne(HttpHeaders headers,String id) {
+        try {
+            checkAuthentication(headers, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         BasicDBObject query = new BasicDBObject();
         query.put("_id" , new ObjectId(id));
 
@@ -169,8 +178,8 @@ public class UsersService {
 
         return user;
     }
-    /*
-    void checkAuthentication(HttpHeaders headers,String id) throws Exception{
+
+    void checkAuthentication(HttpHeaders headers, String id) throws Exception{
         List<String> authHeaders = headers.getRequestHeader(HttpHeaders.AUTHORIZATION);
         if (authHeaders == null)
             throw new APPUnauthorizedException(70,"No Authorization Headers");
@@ -180,7 +189,7 @@ public class UsersService {
             throw new APPUnauthorizedException(71,"Invalid token. Please try getting a new token");
         }
     }
-*/
+
 
 
 
